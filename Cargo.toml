@@ -1,0 +1,11 @@
+[package]
+name = "tdi_ray_tracer_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+assert_approx_eq = "1.1.0"
+rand = "0.8.5"
+strum = "0.24"
+strum_macros = "0.24"
+core_simd = { git = "https://github.com/rust-lang/portable-simd" }
