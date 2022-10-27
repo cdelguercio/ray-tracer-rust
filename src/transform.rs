@@ -7,7 +7,7 @@ pub struct Transform {
 }
 
 impl Transform {
-    pub fn new() -> Transform {
+    pub fn new() -> Self {
         Transform {
             position: vector3::Vector3::new(0.0, 0.0, 0.0),
             rotation: quaternion::Quaternion::new(0.0, 0.0, 0.0, 1.0),

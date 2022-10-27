@@ -11,11 +11,11 @@ pub struct Quaternion {
 }
 
 impl Quaternion {
-    pub fn new(x: f64, y: f64, z: f64, w: f64) -> Quaternion {
+    pub fn new(x: f64, y: f64, z: f64, w: f64) -> Self {
         Quaternion { x, y, z, w }
     }
 
-    fn from_roll_pitch_yaw(roll: f64, pitch: f64, yaw: f64) -> Quaternion {
+    pub fn from_roll_pitch_yaw(roll: f64, pitch: f64, yaw: f64) -> Self {
         let (sin_roll, cos_roll) = (roll / 2.0).sin_cos();
         let (sin_pitch, cos_pitch) = (pitch / 2.0).sin_cos();
         let (sin_yaw, cos_yaw) = (yaw / 2.0).sin_cos();
@@ -28,7 +28,17 @@ impl Quaternion {
         }
     }
 
-    fn from_axis_angle(axis: vector3::Vector3, angle: f64) -> Quaternion {
+    pub fn to_roll_pitch_yaw(&self) -> (f64, f64, f64) {
+        let (roll, pitch, yaw) = (
+            self.x.atan2(self.w) * 2.0,
+            self.y.atan2(self.w) * 2.0,
+            self.z.atan2(self.w) * 2.0,
+        );
+
+        (roll, pitch, yaw)
+    }
+
+    pub fn from_axis_angle(axis: &vector3::Vector3, angle: f64) -> Self {
         let (sin, cos) = (angle / 2.0).sin_cos();
 
         Quaternion {
@@ -43,7 +53,7 @@ impl Quaternion {
         Quaternion::new(-self.x, -self.y, -self.z, self.w)
     }
 
-    fn inverse(&self) -> Quaternion {
+    pub fn inverse(&self) -> Quaternion {
         self.conjugate() * (1.0 / self.norm_squared())
     }
 
@@ -125,11 +135,20 @@ mod tests {
     fn from_axis_angle() {
         let axis = vector3::Vector3::new(1.0, 0.0, 0.0);
         let angle = consts::PI / 2.0;
-        let q = Quaternion::from_axis_angle(axis, angle);
+        let q = Quaternion::from_axis_angle(&axis, angle);
         assert_approx_eq!(q.x, consts::FRAC_1_SQRT_2, 1e-6f64);
         assert_approx_eq!(q.y, 0.0, 1e-6f64);
         assert_approx_eq!(q.z, 0.0, 1e-6f64);
         assert_approx_eq!(q.w, consts::FRAC_1_SQRT_2, 1e-6f64);
+    }
+
+    #[test]
+    fn to_roll_pitch_yaw() {
+        let q = Quaternion::from_roll_pitch_yaw(0.0, 0.0, consts::PI / 2.0);
+        let (roll, pitch, yaw) = q.to_roll_pitch_yaw();
+        assert_approx_eq!(roll, 0.0, 1e-6f64);
+        assert_approx_eq!(pitch, 0.0, 1e-6f64);
+        assert_approx_eq!(yaw, consts::PI / 2.0, 1e-6f64);
     }
 
     #[test]

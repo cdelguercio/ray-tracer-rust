@@ -6,12 +6,12 @@ pub struct RandomGenerator {
 }
 
 impl RandomGenerator {
-    fn new() -> RandomGenerator {
+    pub fn new() -> Self {
         RandomGenerator {
             rng: rand::thread_rng(),
         }
     }
-    fn value(&mut self, scale: f64) -> f64 {
+    pub fn value(&mut self, scale: f64) -> f64 {
         self.rng.gen_range(0.0..scale)
     }
 }
