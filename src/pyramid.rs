@@ -63,8 +63,8 @@ impl Pyramid {
         let test = vector3::Vector3::normalized_sub(point, &self.origin);
 
         vector3::Vector3::new(
-            ((vector3::Vector3::dot(&test, &self.vertical) / self.vertical_dot) + 1.0) / 2.0,
             ((vector3::Vector3::dot(&test, &self.horizontal) / self.horizontal_dot) + 1.0) / 2.0,
+            ((vector3::Vector3::dot(&test, &self.vertical) / self.vertical_dot) + 1.0) / 2.0,
             vector3::Vector3::dot(&test, &self.direction),
         )
     }
@@ -73,6 +73,21 @@ impl Pyramid {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_new() {
+        let position = vector3::Vector3::new(0.0, 0.0, 0.0);
+        let rotation = quaternion::Quaternion::new(0.0, 0.0, 0.0, 1.0);
+        let vertical_fov = angle::Angle::from_degrees(90.0);
+        let horizontal_fov = angle::Angle::from_degrees(90.0);
+        let pyramid = Pyramid::new(position, rotation, vertical_fov, horizontal_fov);
+        assert_eq!(pyramid.origin, position);
+        assert_eq!(pyramid.direction, vector3::Vector3::new(0.0, 0.0, 1.0));
+        assert_eq!(pyramid.vertical, vector3::Vector3::new(0.0, 1.0, 0.0));
+        assert_eq!(pyramid.horizontal, vector3::Vector3::new(1.0, 0.0, 0.0));
+        assert_eq!(pyramid.vertical_dot, 1.0);
+        assert_eq!(pyramid.horizontal_dot, 1.0);
+    }
 
     #[test]
     fn contains_point() {
