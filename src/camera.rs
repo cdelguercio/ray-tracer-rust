@@ -106,3 +106,27 @@ impl Camera {
         self.object.forward()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::quaternion;
+    use super::*;
+
+    #[test]
+    fn test_coord_for_point() {
+        let mut camera = Camera::new(100, 100, &angle::Angle::from_degrees(90.0));
+        camera.object.transform.position = vector3::Vector3::new(0.0, 0.0, 0.0);
+        camera.object.transform.rotation = quaternion::Quaternion::from_roll_pitch_yaw(0.0, 0.0, 0.0);
+
+        // TODO(cdelguercio): write tests
+    }
+
+    #[test]
+    fn test_pixel_direction() {
+        let mut camera = Camera::new(100, 100, &angle::Angle::from_degrees(90.0));
+        camera.object.transform.position = vector3::Vector3::new(0.0, 0.0, 0.0);
+        camera.object.transform.rotation = quaternion::Quaternion::from_roll_pitch_yaw(0.0, 0.0, 0.0);
+
+        // TODO(cdelguercio): write tests
+    }
+}

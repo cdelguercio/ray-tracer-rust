@@ -6,12 +6,12 @@ use png;
 
 use crate::image;
 
-struct PngWriter<'a> {
+pub struct PngWriter<'a> {
     encoder: png::Encoder<'a, io::BufWriter<fs::File>>,
 }
 
 impl PngWriter<'static> {
-    fn new(width: u32, height: u32, file: &path::Path) -> Self {
+    pub fn new(width: u32, height: u32, file: &path::Path) -> Self {
         let file = fs::File::create(file).unwrap();
         let mut writer = io::BufWriter::new(file);
         let mut encoder = png::Encoder::new(writer, width, height);
@@ -22,7 +22,7 @@ impl PngWriter<'static> {
         }
     }
 
-    fn write(self, data: &image::Image) {
+    pub fn write(self, data: &image::Image) {
         let mut writer = self.encoder.write_header().unwrap();
         writer.write_image_data(&data.unpack()).unwrap();
     }

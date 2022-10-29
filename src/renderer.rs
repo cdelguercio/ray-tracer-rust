@@ -66,7 +66,7 @@ impl Renderer {
     }
 
     // bounce_photon_hit bounces a photon hit, and then optionally generates another photon
-    pub fn bounce_photon_hit(&mut self, photon_hit: &photon::PhotonHit, random_generator: &mut random_generator::RandomGenerator) -> Option<photon::Photon> {
+    pub fn bounce_photon_hit(&self, photon_hit: &photon::PhotonHit, random_generator: &mut random_generator::RandomGenerator) -> Option<photon::Photon> {
         if photon_hit.photon.bounces >= self.m_bounce_threshold {
             return None;
         }

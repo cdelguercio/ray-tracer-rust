@@ -254,16 +254,16 @@ mod tests {
     fn cast_ray() {
         let mut hits: Vec<hit::Hit> = Vec::new();
         let ray = ray::Ray::new(
-            vector3::Vector3::new(0.0, 0.0, 0.0),
-            vector3::Vector3::new(1.0, 1.0, 1.0)
+            vector3::Vector3::new(0.25, 0.25, -1.0),
+            vector3::Vector3::new(0.0, 0.0, 1.0),
         );
         let node = Node {
             left: None,
             right: None,
             contents: vec![triangle::Triangle::new(
                 vector3::Vector3::new(0.0, 0.0, 0.0),
-                vector3::Vector3::new(0.0, 0.0, 1.0),
-                vector3::Vector3::new(0.0, 0.0, 2.0),
+                vector3::Vector3::new(0.0, 1.0, 0.0),
+                vector3::Vector3::new(1.0, 0.0, 0.0),
             )],
             axis: vector3::Axis::X,
             pivot: 0.0,
@@ -271,7 +271,7 @@ mod tests {
             bounds: bounds::Bounds::new(
                 limits::Limits::new(0.0, 1.0),
                 limits::Limits::new(0.0, 1.0),
-                limits::Limits::new(0.0, 1.0),
+                limits::Limits::new(0.0, 0.0),
             ),
         };
 
@@ -289,16 +289,16 @@ mod tests {
     fn cast_ray_into_node() {
         let mut hits: Vec<hit::Hit> = Vec::new();
         let ray = ray::Ray::new(
-            vector3::Vector3::new(0.0, 0.0, 0.0),
-            vector3::Vector3::new(1.0, 1.0, 1.0)
+            vector3::Vector3::new(0.25, 0.25, -1.0),
+            vector3::Vector3::new(0.0, 0.0, 1.0),
         );
         let node = Node {
             left: None,
             right: None,
             contents: vec![triangle::Triangle::new(
                 vector3::Vector3::new(0.0, 0.0, 0.0),
-                vector3::Vector3::new(0.0, 0.0, 1.0),
-                vector3::Vector3::new(0.0, 0.0, 2.0),
+                vector3::Vector3::new(0.0, 1.0, 0.0),
+                vector3::Vector3::new(1.0, 0.0, 0.0),
             )],
             axis: vector3::Axis::X,
             pivot: 0.0,
@@ -306,7 +306,7 @@ mod tests {
             bounds: bounds::Bounds::new(
                 limits::Limits::new(0.0, 1.0),
                 limits::Limits::new(0.0, 1.0),
-                limits::Limits::new(0.0, 1.0),
+                limits::Limits::new(0.0, 0.0),
             ),
         };
 
