@@ -11,3 +11,6 @@ strum = "0.24"
 strum_macros = "0.24"
 tobj = "3.2.3"
 core_simd = { git = "https://github.com/rust-lang/portable-simd" }
+
+[dev-dependencies]
+rstest = "0.15.0"

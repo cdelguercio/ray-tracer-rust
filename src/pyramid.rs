@@ -74,6 +74,9 @@ impl Pyramid {
 mod tests {
     use super::*;
 
+    use assert_approx_eq::assert_approx_eq;
+    use rstest::*;
+
     #[test]
     fn test_new() {
         let position = vector3::Vector3::new(0.0, 0.0, 0.0);
@@ -139,27 +142,31 @@ mod tests {
         assert!(!pyramid.intersects_bounds(&bounds::Bounds::from_vectors(vector3::Vector3::new(0.0, 0.0, 0.0), vector3::Vector3::new(-2.0, 0.0, 0.0))));
     }
 
-    #[test]
-    fn relative_position_in_frustum() {
-        let pyramid = Pyramid::new(
+    #[fixture]
+    pub fn fixture() -> Pyramid {
+        Pyramid::new(
             vector3::Vector3::new(0.0, 0.0, 0.0),
             quaternion::Quaternion::from_roll_pitch_yaw(0.0, 0.0, 0.0),
             angle::Angle::from_degrees(90.0),
             angle::Angle::from_degrees(90.0),
-        );
+        )
+    }
 
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, 0.0, 1.0)), vector3::Vector3::new(0.0, 0.0, 0.0)); // TODO: I don't even know what this function does, so these are just placeholder tests
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, 0.0, -1.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, 1.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, -1.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(1.0, 0.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(-1.0, 0.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, 0.0, 2.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, 0.0, -2.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, 2.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(0.0, -2.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(2.0, 0.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
-        assert_eq!(pyramid.relative_position_in_frustum(&vector3::Vector3::new(-2.0, 0.0, 0.0)), vector3::Vector3::new(0.0, 0.0, 0.0));
+    #[rstest]
+    #[case((0.0, 0.0, 0.0), (0.5, 0.5, 0.0))]
+    #[case((0.0, 0.0, 0.5), (0.5, 0.5, 0.0))]
+    #[case((0.0, 0.0, 1.0), (0.5, 0.5, 0.0))]
+    #[case((1.0, 0.0, 0.0), (0.0, 0.5, 0.0))]
+    #[case((1.0, 0.0, 1.0), (0.0, 0.5, 0.0))]
+    #[case((0.0, 1.0, 0.0), (0.5, 0.0, 0.0))]
+    #[case((0.0, 1.0, 1.0), (0.5, 0.0, 0.0))]
+    #[case((1.0, 1.0, 0.0), (0.0, 0.0, 0.0))]
+    #[case((1.0, 1.0, 1.0), (0.0, 0.0, 0.0))]
+    #[case((10.0, 10.0, 10.0), (0.0, 0.0, 0.0))]
+    fn relative_position_in_frustum(fixture: Pyramid, #[case] position: (f64, f64, f64), #[case] expected: (f64, f64, f64)) {
+        let test_position = fixture.relative_position_in_frustum(&vector3::Vector3::new(position.0, position.1, position.2));
+        assert_approx_eq!(test_position.get_x(), expected.0, 1e-3);
+        assert_approx_eq!(test_position.get_y(), expected.1, 1e-3);
+        assert_approx_eq!(test_position.get_z(), expected.2, 1e-3);
     }
 }
