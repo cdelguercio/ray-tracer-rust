@@ -34,7 +34,7 @@ impl<T: LightStrategy> Light<T> {
     pub fn new(specialization: T) -> Light<T> {
         let mut l = Light {
             specialization: Box::new(specialization),
-            m_color: color::Color::default(),
+            m_color: color::Color::new(1.0, 1.0, 1.0),
             m_brightness: 0.0,
             m_area: 0.0,
             m_lumens: 0.0,

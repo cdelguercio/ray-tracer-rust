@@ -23,7 +23,7 @@ mod obj_reader;
 mod object;
 pub mod parallel_light;
 pub mod photon;
-mod pixel;
+pub mod pixel;
 mod pixel_coords;
 mod plane;
 mod plane_volume;
