@@ -1,12 +1,12 @@
-use std::path;
-use tdi_ray_tracer::{angle, camera, hit, image, mesh, mesh_volume, parallel_light, parallel_light::LightPublicInterface, photon, pixel, png_writer, quaternion, random_generator, renderer, triangle, vector3};
+use tdi_ray_tracer::{angle, camera, hit, image, library, mesh, mesh_volume, parallel_light,
+                     parallel_light::LightPublicInterface, photon, pipeline, pixel, png_writer,
+                     quaternion, random_generator, renderer, scene, triangle, vector3};
 
 fn main() {
+    let material_library = library::Library::build_material_library();
+
     let image_width = 100;
     let image_height = 100;
-
-    let mut rg = random_generator::RandomGenerator::new();
-
     let camera = camera::Camera::new(
         image_width,
         image_height,
@@ -21,7 +21,7 @@ fn main() {
         ),
     ];
 
-    let mesh_volume = Box::new(mesh_volume::MeshVolume::new(0, mesh::Mesh::new("test_mesh", triangles)));
+    let mesh_volume = Box::new(mesh_volume::MeshVolume::new(material_library.index_for_name("Cyan"), mesh::Mesh::new("test_mesh", triangles)));
 
     let mut light = parallel_light::ParallelLight::new();
     light.set_radius(1.0);
@@ -29,44 +29,18 @@ fn main() {
     light.set_position(vector3::Vector3::new(0.25, 0.25, 1.5));
     light.set_rotation(quaternion::Quaternion::from_roll_pitch_yaw(0.0, 0.0, 0.0));
 
-    let mut photon = photon::Photon::default();
-
-    let renderer = renderer::Renderer::new(
+    let s = scene::Scene {
         camera,
-        vec![mesh_volume],
-    );
-
-    let mut cast_buffer = Vec::<hit::Hit>::new();
-
-    let mut volume_hit_buffer = Vec::<photon::PhotonHit>::new();
-
-    let mut image = image::Image::new(image_width, image_height);
-
-    println!("photon = \n{:?}\n", photon);
-
-    renderer.process_light(&light, &mut photon, 1.0, &mut rg);
-
-    println!("photon = \n{:?}\n", photon);
-
-    let photon_hit = renderer.process_photon(&mut photon, &mut cast_buffer, &mut volume_hit_buffer);
-
-    println!("photon_hit = \n{:?}\n", photon_hit);
-
-    let Some(photon_hit) = photon_hit else {
-      panic!("photon_hit is None");
+        volumes: vec![mesh_volume],
+        lights: vec![Box::new(light)],
+        material_library,
     };
 
-    renderer.bounce_photon_hit(&photon_hit, &mut rg);
+    let renderer = renderer::Renderer::new();
 
-    if renderer.process_hit(&photon_hit, &mut cast_buffer) {
-        let result = renderer.process_final_hit(&photon_hit);
+    let p = pipeline::Pipeline::new(
+        renderer,
+    );
 
-        if let Some((pc, c)) = result {
-            image.set_pixel(pc.x, pc.y, pixel::Pixel::from_color(&c));
-        }
-    }
-
-    let png_w = png_writer::PngWriter::new(image_width as u32, image_height as u32, path::Path::new("test.png"));
-
-    png_w.write(&image);
+    p.render_scene(&s);
 }

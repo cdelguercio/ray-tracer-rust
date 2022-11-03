@@ -22,7 +22,7 @@ impl<T> Library<T> {
         self.m_index_map.insert(name.to_string(), self.m_contents.len() - 1);
     }
 
-    fn index_for_name(&self, name: &str) -> usize {
+    pub fn index_for_name(&self, name: &str) -> usize {
         if !self.m_index_map.contains_key(name) {
             panic!("Cannot get index for name {}, name does not exist", name);
         }
