@@ -26,11 +26,11 @@ impl Camera {
         };
     }
 
-    fn width(&self) -> usize {
+    pub fn width(&self) -> usize {
         return self.m_width;
     }
 
-    fn height(&self) -> usize {
+    pub fn height(&self) -> usize {
         return self.m_height;
     }
 
