@@ -1,7 +1,7 @@
 use std::f64::consts;
 use std::ops;
+use std::simd;
 
-use core_simd;
 use strum_macros::EnumIter;
 
 use crate::{math, random_generator};
@@ -26,20 +26,20 @@ impl Axis {
 #[repr(align(64))] // TODO(cdelguercio): Not sure if this makes simd faster
 #[derive(Copy, Clone, Debug)]
 pub struct Vector3 {
-    data: core_simd::f64x4,
+    data: simd::f64x4,
 }
 
-pub const UNIT_X: Vector3 = Vector3 { data: core_simd::f64x4::from_array([1.0, 0.0, 0.0, 0.0]) };
-pub const UNIT_Y: Vector3 = Vector3 { data: core_simd::f64x4::from_array([0.0, 1.0, 0.0, 0.0]) };
-pub const UNIT_Z: Vector3 = Vector3 { data: core_simd::f64x4::from_array([0.0, 0.0, 1.0, 0.0]) };
+pub const UNIT_X: Vector3 = Vector3 { data: simd::f64x4::from_array([1.0, 0.0, 0.0, 0.0]) };
+pub const UNIT_Y: Vector3 = Vector3 { data: simd::f64x4::from_array([0.0, 1.0, 0.0, 0.0]) };
+pub const UNIT_Z: Vector3 = Vector3 { data: simd::f64x4::from_array([0.0, 0.0, 1.0, 0.0]) };
 
 impl Vector3 {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Vector3 {
-            data: core_simd::f64x4::from_array([x, y, z, 0.0]),
+            data: simd::f64x4::from_array([x, y, z, 0.0]),
         }
     }
-    pub fn new_simd(data: core_simd::f64x4) -> Self {
+    pub fn new_simd(data: simd::f64x4) -> Self {
         Vector3 { data }
     }
 
@@ -80,13 +80,13 @@ impl Vector3 {
         )
     }
 
-    fn normalized_simd(data: core_simd::f64x4) -> core_simd::f64x4 { // TODO(cdelguercio): why are these static?
+    fn normalized_simd(data: simd::f64x4) -> simd::f64x4 { // TODO(cdelguercio): why are these static?
         let dot = Vector3::dot_simd(data, data);
 
         // approximate inverse square root
         let inv_root = math::quake_rsqrt(dot as f32) as f64;
 
-        data * core_simd::f64x4::from_array([inv_root, inv_root, inv_root, 0.0])
+        data * simd::f64x4::from_array([inv_root, inv_root, inv_root, 0.0])
 
         // slow inverse square root
         // let root = dot.sqrt();
@@ -103,7 +103,7 @@ impl Vector3 {
     }
 
     // TODO(cdelguercio): I'm not sure why this needs to exist, there should be a comment here explaining why
-    pub fn dot_simd(lhs: core_simd::f64x4, rhs: core_simd::f64x4) -> f64 {
+    pub fn dot_simd(lhs: simd::f64x4, rhs: simd::f64x4) -> f64 {
         let dot = lhs * rhs;
         dot[0] + dot[1] + dot[2]
     }
@@ -146,7 +146,7 @@ impl Vector3 {
 impl Default for Vector3 {
     fn default() -> Self {
         Vector3 {
-            data: core_simd::f64x4::from_array([0.0, 0.0, 0.0, 0.0]),
+            data: simd::f64x4::from_array([0.0, 0.0, 0.0, 0.0]),
         }
     }
 }
@@ -221,7 +221,7 @@ mod tests {
 
     #[test]
     fn new_simd() {
-        let v = Vector3::new_simd(core_simd::f64x4::from_array([1.0, 2.0, 3.0, 0.0]));
+        let v = Vector3::new_simd(simd::f64x4::from_array([1.0, 2.0, 3.0, 0.0]));
         assert_eq!(v.data[0], 1.0);
         assert_eq!(v.data[1], 2.0);
         assert_eq!(v.data[2], 3.0);
@@ -230,8 +230,8 @@ mod tests {
 
     #[test]
     fn dot_simd() {
-        let v1 = Vector3::new_simd(core_simd::f64x4::from_array([1.0, 2.0, 3.0, 0.0]));
-        let v2 = Vector3::new_simd(core_simd::f64x4::from_array([4.0, 5.0, 6.0, 0.0]));
+        let v1 = Vector3::new_simd(simd::f64x4::from_array([1.0, 2.0, 3.0, 0.0]));
+        let v2 = Vector3::new_simd(simd::f64x4::from_array([4.0, 5.0, 6.0, 0.0]));
         let dot = Vector3::dot_simd(v1.data, v2.data);
         assert_eq!(dot, 32.0);
     }
